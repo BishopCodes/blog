@@ -1,0 +1,323 @@
+---
+import { ClientRouter } from "astro:transitions";
+import "@/styles/global.css";
+import HexDump from "@/components/hexdump.astro";
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en" class="bg-neutral-950">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Code, architecture, opinions, and the occasional rant by Bishop."
+    />
+    <title>{title}</title>
+
+    <ClientRouter />
+  </head>
+
+  <body
+    class="flex min-h-screen flex-col font-mono text-neutral-300 antialiased"
+  >
+    <HexDump />
+
+    <div aria-hidden="true" class="cursor-glow"></div>
+
+    <header
+      transition:persist
+      class="sticky top-0 z-10 border-b border-neutral-800/70 bg-neutral-950/70 backdrop-blur-[2px]"
+    >
+      <div class="mx-auto flex max-w-4xl items-center gap-2 px-6 py-5">
+        <a
+          href="/"
+          class="shrink-0 text-lg font-bold tracking-tight"
+          aria-label="Bishop Codes home"
+        >
+          <span class="text-blue-400">bishop@codes</span>
+          <span class="ml-2 text-neutral-500">:~</span>
+          <span class="ml-2 text-blue-400">$</span>
+          <span class="ml-2 text-white">fzf</span>
+        </a>
+
+        <form
+          id="orama-search"
+          role="search"
+          class="group relative min-w-0 flex-1 w-2/4 after:absolute after:bottom-0 after:left-1 after:right-0 after:h-px after:bg-neutral-700 after:transition-opacity focus-within:after:opacity-0"
+        >
+          <input
+            type="search"
+            role="combobox"
+            aria-controls="orama-search-results"
+            aria-expanded="false"
+            aria-autocomplete="list"
+            autofocus
+            class="w-full min-w-0 appearance-none bg-transparent pl-1 text-lg text-neutral-100 caret-white outline-none"
+          />
+
+          <ul
+            id="orama-search-results"
+            role="listbox"
+            class="absolute inset-x-0 top-full mt-2 hidden overflow-hidden rounded-md border border-neutral-800 bg-neutral-950/95 shadow-lg shadow-black/50 backdrop-blur-[2px]"
+          >
+          </ul>
+        </form>
+      </div>
+    </header>
+
+    <main
+      class="mx-auto w-full max-w-4xl flex-1 px-6 py-10 backdrop-blur-[3px]"
+    >
+      <slot />
+    </main>
+
+    <script>
+      const initCursorGlow = () => {
+        let x = 0;
+        let y = 0;
+        let framePending = false;
+
+        const glow = document.querySelector<HTMLElement>(".cursor-glow");
+
+        if (!glow) return;
+
+        const updateGlow = () => {
+          glow.style.setProperty("--mx", `${x}px`);
+          glow.style.setProperty("--my", `${y}px`);
+          framePending = false;
+        };
+
+        document.addEventListener("pointermove", (event) => {
+          x = event.clientX;
+          y = event.clientY;
+
+          if (framePending) return;
+
+          framePending = true;
+          requestAnimationFrame(updateGlow);
+        });
+      };
+
+      const initSearch = () => {
+        const form = document.querySelector<HTMLFormElement>("#orama-search");
+        const input = form?.querySelector<HTMLInputElement>("input");
+        const results = document.querySelector<HTMLUListElement>(
+          "#orama-search-results"
+        );
+
+        if (!form || !input || !results) return;
+
+        let activeIndex = -1;
+        let searchRequest = 0;
+
+        const dbPromise = (async () => {
+          const [{ create, load }, response] = await Promise.all([
+            import("@orama/orama"),
+            fetch("/search-index.json"),
+          ]);
+
+          if (!response.ok) {
+            throw new Error(`Unable to load search index: ${response.status}`);
+          }
+
+          const serialized = await response.json();
+
+          const db = create({
+            schema: {
+              id: "string",
+              title: "string",
+              description: "string",
+              content: "string",
+              tag: "string",
+              path: "string",
+            },
+          });
+
+          load(db, serialized);
+
+          return db;
+        })();
+
+        const getLinks = () => results.querySelectorAll<HTMLAnchorElement>("a");
+
+        const setActive = (index: number) => {
+          const links = getLinks();
+
+          links.forEach((link, i) => {
+            const isActive = i === index;
+
+            link.classList.toggle("bg-neutral-900", isActive);
+            link.setAttribute("aria-selected", String(isActive));
+          });
+
+          activeIndex = index;
+
+          if (index < 0 || !links[index]) {
+            input.removeAttribute("aria-activedescendant");
+            return;
+          }
+
+          input.setAttribute("aria-activedescendant", links[index].id);
+          links[index].scrollIntoView({
+            block: "nearest",
+          });
+        };
+
+        const clearResults = () => {
+          results.replaceChildren();
+          results.classList.add("hidden");
+
+          input.setAttribute("aria-expanded", "false");
+          input.removeAttribute("aria-activedescendant");
+
+          activeIndex = -1;
+        };
+
+        const renderResults = (items: any[]) => {
+          results.replaceChildren();
+
+          if (!items.length) {
+            const empty = document.createElement("li");
+
+            empty.className = "px-4 py-3 text-sm text-neutral-500";
+            empty.textContent = "no matches";
+
+            results.append(empty);
+          } else {
+            items.forEach(({ document: doc }, index) => {
+              const link = document.createElement("a");
+
+              link.href = doc.path;
+              link.id = `orama-option-${index}`;
+              link.setAttribute("role", "option");
+              link.setAttribute("tabindex", "-1");
+              link.setAttribute("aria-selected", "false");
+
+              link.className =
+                "block border-b border-neutral-900 px-4 py-3 transition-colors last:border-b-0 hover:bg-neutral-900";
+
+              const title = document.createElement("span");
+
+              title.className = "block text-sm text-neutral-200";
+              title.textContent = doc.title;
+
+              const path = document.createElement("span");
+
+              path.className = "mt-1 block text-xs text-neutral-600";
+              path.textContent = doc.path;
+
+              link.append(title, path);
+              results.append(link);
+            });
+          }
+
+          input.setAttribute("aria-expanded", String(items.length > 0));
+
+          results.classList.remove("hidden");
+          setActive(-1);
+        };
+
+        const search = async (term: string) => {
+          const requestId = ++searchRequest;
+
+          try {
+            const [{ search: oramaSearch }, db] = await Promise.all([
+              import("@orama/orama"),
+              dbPromise,
+            ]);
+
+            if (requestId !== searchRequest) return;
+
+            const { hits } = oramaSearch(db, {
+              term,
+              limit: 8,
+            });
+
+            if (requestId !== searchRequest) return;
+
+            renderResults(hits);
+          } catch (error) {
+            console.error("Search failed:", error);
+
+            if (requestId === searchRequest) {
+              clearResults();
+            }
+          }
+        };
+
+        input.addEventListener("input", async () => {
+          const term = input.value.trim();
+
+          if (!term) {
+            searchRequest++;
+            clearResults();
+            return;
+          }
+
+          await search(term);
+        });
+
+        input.addEventListener("keydown", (event) => {
+          const links = getLinks();
+
+          switch (event.key) {
+            case "Escape":
+              input.value = "";
+              searchRequest++;
+              clearResults();
+              break;
+
+            case "ArrowDown":
+            case "ArrowUp": {
+              if (!links.length || results.classList.contains("hidden")) {
+                return;
+              }
+
+              event.preventDefault();
+
+              const direction = event.key === "ArrowDown" ? 1 : -1;
+
+              const nextIndex =
+                activeIndex < 0
+                  ? direction === 1
+                    ? 0
+                    : links.length - 1
+                  : (activeIndex + direction + links.length) % links.length;
+
+              setActive(nextIndex);
+              break;
+            }
+
+            case "Enter": {
+              event.preventDefault();
+
+              const target = activeIndex >= 0 ? links[activeIndex] : links[0];
+
+              if (target) {
+                window.location.href = target.href;
+              }
+
+              break;
+            }
+          }
+        });
+
+        results.addEventListener("mousedown", (event) => {
+          event.preventDefault();
+        });
+
+        input.addEventListener("blur", clearResults);
+      };
+
+      initCursorGlow();
+      initSearch();
+    </script>
+  </body>
+</html>

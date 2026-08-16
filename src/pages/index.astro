@@ -1,0 +1,72 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getCollection } from "astro:content";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const tagClassMap = new Map([
+  ["code", "text-cyan-400"],
+  ["rant", "text-red-400"],
+  ["opinion", "text-teal-400"],
+  ["architecture", "text-amber-400"],
+  ["talk", "text-neutral-200"],
+]);
+---
+
+<Layout
+  title="BishopCodes — Code, architecture, opinions, and the occasional rant"
+>
+  <section class="mb-14">
+    <p class="text-sm text-neutral-500">
+      <span class="text-green-400">~</span><span class="ml-1 text-blue-400">$</span
+      ><span class="text-white ml-1">./blog.sh</span>
+    </p>
+    <h1 class="shimmer mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
+      BishopCodes
+    </h1>
+    <p class="mt-4 max-w-xl text-neutral-400">
+      Code, architecture, opinions, and the occasional rant.
+    </p>
+  </section>
+
+  <h2 class="mb-4 text-xs uppercase tracking-widest text-neutral-500">
+    Recent posts
+  </h2>
+
+  <ul class="space-y-4">
+    {
+      posts.map((post) => (
+        <li>
+          <a
+            href={`/posts/${post.id}/`}
+            class="group block rounded-xl border border-neutral-800 bg-neutral-900/40 p-5 backdrop-blur-[2px] transition-colors hover:border-blue-400/40 hover:bg-neutral-900/70"
+          >
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+              <span class={tagClassMap.get(post.data.tag)}>
+                [{post.data.tag}]
+              </span>
+              <time
+                class="text-neutral-500"
+                datetime={post.data.date.toISOString()}
+              >
+                {post.data.date.toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
+              </time>
+            </div>
+            <h3 class="mt-2 text-lg font-semibold text-white transition-colors group-hover:text-blue-300">
+              {post.data.title}
+            </h3>
+            <p class="mt-1.5 text-sm text-neutral-400">
+              {post.data.description}
+            </p>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</Layout>
