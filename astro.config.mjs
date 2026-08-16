@@ -5,9 +5,12 @@ import tailwindcss from '@tailwindcss/vite';
 import { remarkModified } from "@/plugins/remark-modified.mjs"
 import { remarkReadingTime } from '@/plugins/remark-reading-time.mjs';
 
+import sitemap from '@astrojs/sitemap';
+
 export default defineConfig({
   vite: { plugins: [tailwindcss()] },
   site: 'https://bishopcodes.github.io',
+
   markdown: {
     processor: unified({
       rehypePlugins: [
@@ -20,5 +23,7 @@ export default defineConfig({
       ],
       remarkPlugins: [remarkModified, remarkReadingTime]
     })
-  }
+  },
+
+  integrations: [sitemap()]
 });
