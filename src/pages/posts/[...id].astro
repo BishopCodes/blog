@@ -39,7 +39,6 @@ const tagClassMap = {
 <Layout title={`${post.data.title} — BishopCodes`}>
   <a
     href="/"
-    transition:persist
     aria-label="Back to all posts"
     class="text-sm text-neutral-400 transition-colors hover:text-cyan-300"
   >
@@ -47,13 +46,13 @@ const tagClassMap = {
     <span class="ml-2">cd ..</span>
   </a>
 
-  <p transition:persist class="mt-6 text-sm text-neutral-400">
+  <p class="mt-6 text-sm text-neutral-400">
     <span class="text-blue-400">$</span>
     <span class="ml-2 text-green-400">bat</span>
     <span class="ml-2 text-neutral-300">./posts/{post.id}.md</span>
   </p>
 
-  <div transition:animate="slide" class="mt-6">
+  <div class="mt-6">
     <article>
       <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs">
         <span class={tagClassMap[post.data.tag]}>
