@@ -4,11 +4,9 @@
   const loadGiscus = () => {
     const container = document.getElementById("giscus");
 
-    if (!container || container.dataset.loaded === "true") {
+    if (!container || container.querySelector("script")) {
       return;
     }
-
-    container.dataset.loaded = "true";
 
     const script = document.createElement("script");
 
@@ -41,6 +39,15 @@
       return;
     }
 
+    if (container.querySelector("iframe, script")) {
+      return;
+    }
+
+    if (!("IntersectionObserver" in window)) {
+      loadGiscus();
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) {
@@ -51,7 +58,7 @@
         loadGiscus();
       },
       {
-        rootMargin: "0px",
+        rootMargin: "400px 0px",
         threshold: 0,
       }
     );
