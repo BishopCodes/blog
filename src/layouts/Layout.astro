@@ -35,7 +35,7 @@ const { title } = Astro.props;
       transition:persist
       class="sticky top-0 z-10 border-b border-neutral-800/70 bg-neutral-950/70 backdrop-blur-[2px]"
     >
-      <div class="mx-auto flex max-w-4xl items-center gap-2 px-6 py-5">
+      <div class="mx-auto flex max-w-4xl flex-col gap-2 px-6 py-5 sm:flex-row sm:items-center">
         <a
           href="/"
           class="shrink-0 text-lg font-bold tracking-tight"
@@ -50,7 +50,7 @@ const { title } = Astro.props;
         <form
           id="orama-search"
           role="search"
-          class="group relative min-w-0 flex-1 w-2/4 after:absolute after:bottom-0 after:left-1 after:right-0 after:h-px after:bg-neutral-700 after:transition-opacity focus-within:after:opacity-0"
+          class="group relative min-w-0 w-full after:absolute after:bottom-0 after:left-1 after:right-0 after:h-px after:bg-neutral-700 after:transition-opacity focus-within:after:opacity-0 sm:flex-1 sm:w-2/4"
         >
           <input
             type="search"
@@ -235,7 +235,7 @@ const { title } = Astro.props;
 
             if (requestId !== searchRequest) return;
 
-            const { hits } = oramaSearch(db, {
+            const { hits } = await oramaSearch(db, {
               term,
               limit: 8,
             });
