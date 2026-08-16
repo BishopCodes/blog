@@ -19,6 +19,7 @@
     "@astrojs/ts-plugin": "^1.10.10",
     "@orama/orama": "^3.1.18",
     "@tailwindcss/vite": "^4.3.3",
+    "@yeskunall/astro-umami": "0.0.9",
     "astro": "^7.2.2",
     "astro-og-canvas": "^0.13.0",
     "canvaskit-wasm": "^0.41.1",
@@ -27,5 +28,8 @@
     "reading-time": "^1.5.0",
     "rehype-external-links": "^3.0.0",
     "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2"
   }
 }
