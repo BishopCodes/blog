@@ -1,0 +1,65 @@
+<div id="giscus"></div>
+
+<script>
+  const loadGiscus = () => {
+    const container = document.getElementById("giscus");
+
+    if (!container || container.dataset.loaded === "true") {
+      return;
+    }
+
+    container.dataset.loaded = "true";
+
+    const script = document.createElement("script");
+
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.crossOrigin = "anonymous";
+
+    Object.assign(script.dataset, {
+      repo: "bishopcodes/blog",
+      repoId: "R_kgDOT5sf7Q",
+      category: "General",
+      categoryId: "DIC_kwDOT5sf7c4DDeas",
+      mapping: "pathname",
+      strict: "0",
+      reactionsEnabled: "1",
+      emitMetadata: "0",
+      inputPosition: "top",
+      theme: "noborder_dark",
+      lang: "en",
+      loading: "lazy",
+    });
+
+    container.appendChild(script);
+  };
+
+  const initializeGiscus = () => {
+    const container = document.getElementById("giscus");
+
+    if (!container) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          return;
+        }
+
+        observer.disconnect();
+        loadGiscus();
+      },
+      {
+        rootMargin: "0px",
+        threshold: 0,
+      }
+    );
+
+    observer.observe(container);
+  };
+
+  document.addEventListener("astro:page-load", initializeGiscus);
+
+  initializeGiscus();
+</script>

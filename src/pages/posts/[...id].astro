@@ -1,6 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { getCollection, render } from "astro:content";
+import type { InferGetStaticPropsType } from "astro";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 
@@ -9,12 +10,13 @@ dayjs.extend(utc);
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
   return posts.map((post) => ({
-    params: { slug: post.id },
+    params: { id: post.id },
     props: { post },
   }));
 }
 
-const { post } = Astro.props;
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+const { post }: Props = Astro.props;
 const { Content, remarkPluginFrontmatter } = await render(post);
 const lastModified = dayjs(remarkPluginFrontmatter.lastModified)
   .utc()

@@ -7,13 +7,12 @@
   "exclude": [
     "dist"
   ],
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "src/*"
-      ]
-    },
+    "compilerOptions": {
+      "paths": {
+        "@/*": [
+          "./src/*"
+        ]
+      },
     "strictNullChecks": true,
     "allowJs": true,
     "plugins": [
