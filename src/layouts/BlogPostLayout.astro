@@ -1,0 +1,81 @@
+---
+import BaseLayout from './Layout.astro';
+const { title, frontmatter} = Astro.props;
+---
+<BaseLayout title={title} frontmatter={frontmatter} url={`/posts/${frontmatter.id}`} ogType="article">
+  <a
+    href="/"
+    aria-label="Back to all posts"
+    class="text-sm text-neutral-400 transition-colors hover:text-cyan-300"
+  >
+    <span class="text-blue-400">$</span>
+    <span class="ml-2">cd ..</span>
+  </a>
+
+  <p class="mt-6 text-sm text-neutral-400">
+    <span class="text-blue-400">$</span>
+    <span class="ml-2 text-green-400">bat</span>
+    <span class="ml-2 text-neutral-300">./posts/{frontmatter.id}.md</span>
+  </p>
+
+  <div class="mt-6">
+    <article>
+      <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs">
+        <span class={frontmatter.tagClass}>
+          {`[${frontmatter.tag}]`}
+        </span>
+        <span class="text-neutral-700" aria-hidden="true">·</span>
+        <span class="text-neutral-500">
+          Created
+          <time
+            class="ml-1 text-neutral-500"
+            datetime={frontmatter.date.toISOString()}
+          >
+            {frontmatter.createdOn}
+          </time>
+        </span>
+        <span class="text-neutral-700" aria-hidden="true">·</span>
+        <span class="text-neutral-500"> Modified {frontmatter.lastModified}</span>
+        <span class="text-neutral-700" aria-hidden="true">·</span>
+        <span class="text-neutral-500">
+          {frontmatter.minutesRead}
+        </span>
+      </div>
+
+      <h1 class="mt-4 text-3xl font-bold leading-tight text-white sm:text-4xl">
+        {frontmatter.title}
+      </h1>
+      <p class="mt-2 text-sm text-neutral-400">{frontmatter.description}</p>
+
+      <div class="prose max-w-none prose-img:rounded-xl prose-img:mx-auto mt-8 border-t border-neutral-800 pt-6 text-neutral-300">
+        <slot />
+      </div>
+    </article>
+
+    <a
+      href="/"
+      aria-label="Back to all posts"
+      class="mt-10 inline-block text-sm text-neutral-400 transition-colors hover:text-cyan-300"
+    >
+      <span class="text-blue-400">$</span>
+      <span class="ml-2">cd ..</span>
+    </a>
+  </div>
+  <script
+    src="https://giscus.app/client.js"
+    data-repo="bishopcodes/blog"
+    data-repo-id="R_kgDOT5sf7Q"
+    data-category="General"
+    data-category-id="DIC_kwDOT5sf7c4DDeas"
+    data-mapping="pathname"
+    data-strict="0"
+    data-reactions-enabled="1"
+    data-emit-metadata="0"
+    data-input-position="top"
+    data-theme="noborder_dark"
+    data-lang="en"
+    data-loading="lazy"
+    crossorigin="anonymous"
+    async></script>
+
+</BaseLayout>
