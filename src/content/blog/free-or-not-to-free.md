@@ -1,8 +1,8 @@
 ---
 title: "Free or Not to Free"
 description: "Economies of scale when building out new services or applications"
-date: 2026-08-15
-tag: talk
+date: 2026-08-16
+tag: opinion
 ---
 
 So when starting this blog I took some common principles in mind and that is associated with
