@@ -11,7 +11,7 @@ import sitemap from "@astrojs/sitemap";
 
 export default defineConfig({
   vite: { plugins: [tailwindcss()] },
-  site: "https://bishopcodes.github.io",
+  site: "https://bishopcodes.com",
 
   markdown: {
     processor: unified({

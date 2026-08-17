@@ -63,7 +63,6 @@ const { title, frontmatter, ogType } = Astro.props;
             aria-controls="orama-search-results"
             aria-expanded="false"
             aria-autocomplete="list"
-            autofocus
             class="w-full min-w-0 appearance-none bg-transparent pl-1 text-lg text-neutral-100 caret-white outline-none"
           />
 
@@ -119,10 +118,15 @@ const { title, frontmatter, ogType } = Astro.props;
 
         if (!form || !input || !results) return;
 
-        let activeIndex = -1;
-        let searchRequest = 0;
+      let activeIndex = -1;
+      let searchRequest = 0;
 
-        const dbPromise = (async () => {
+      // Deferred on purpose: the 76 KB orama chunk and 76 KB index only ship to
+      // sessions that actually search, not to every page view.
+      let dbPromise: Promise<any> | undefined;
+
+      const getDb = () => {
+        dbPromise ??= (async () => {
           const [{ create, load }, response] = await Promise.all([
             import("@orama/orama"),
             fetch("/search-index.json"),
@@ -149,6 +153,9 @@ const { title, frontmatter, ogType } = Astro.props;
 
           return db;
         })();
+
+        return dbPromise;
+      };
 
         const getLinks = () => results.querySelectorAll<HTMLAnchorElement>("a");
 
@@ -233,10 +240,10 @@ const { title, frontmatter, ogType } = Astro.props;
           const requestId = ++searchRequest;
 
           try {
-            const [{ search: oramaSearch }, db] = await Promise.all([
-              import("@orama/orama"),
-              dbPromise,
-            ]);
+          const [{ search: oramaSearch }, db] = await Promise.all([
+            import("@orama/orama"),
+            getDb(),
+          ]);
 
             if (requestId !== searchRequest) return;
 

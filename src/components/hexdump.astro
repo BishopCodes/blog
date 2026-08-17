@@ -1,7 +1,10 @@
 ---
-// Easter egg fully static — rendered at build time, zero client JS. Rows repeat
-// enough times to cover any realistic viewport height since the
-// container is position:fixed (viewport-sized, never taller than that).
+// Fully static: the background is built at build time as ONE 21-row SVG tile
+// (data URI) with SMIL-animated "lit" cells, repeated vertically via CSS.
+// Zero client JS, one <div> in the DOM — replaces the previous 126-row /
+// 1,932-span / ~85 KB-HTML-per-page markup. If a browser doesn't run SMIL in
+// background images it degrades to the static texture.
+// A second, animation-free variant backs prefers-reduced-motion.
 
 const HEX_ROWS: [string, string[]][] = [
   ["0002AA30", ["20 1A A1 D8", "CB 51 07 24", "3B A0 5E 60", "4A DE A0 1F"]],
@@ -27,63 +30,80 @@ const HEX_ROWS: [string, string[]][] = [
   ["0002AB70", ["0A D8"]],
 ];
 
-interface Props {
-  repeats?: number;
-}
-const { repeats = 6 } = Astro.props;
-
 const DURATIONS = [4.1, 4.7, 5.3, 5.8, 6.3];
 
-let i = 0;
-const hexRows: {
-  addr: string;
-  groups: string[];
-  litIndex: number;
-  delay: string;
-  dur: number;
-}[] = [];
+const W = 924; // 110ch @ 8.4 px — old `.hexrow` width cap (0.6em of 14 px mono)
+const LINE = 27; // old line-height: calc(1.15em + 11px) @ 14 px
+const PAD = 24; // old row padding: 1.5rem
+const CH = 8.4; // monospace advance @ 14 px
+const GROUPS = 4;
+const ADDR_CHARS = 12; // "/.. " + 8-hex address
+const GROUP_CHARS = 11; // "XX XX XX XX"
 
-for (let rep = 0; rep < repeats; rep++) {
-  for (const [addr, groups] of HEX_ROWS) {
-    const cellCount = groups.reduce((n, g) => n + g.split(" ").length, 0);
-    const litIndex = i % 2 === 0 ? (i * 7) % cellCount : -1;
-    hexRows.push({
-      addr,
-      groups,
-      litIndex,
-      delay: ((i * 0.6) % 4.2).toFixed(1),
-      dur: DURATIONS[i % DURATIONS.length],
-    });
-    i++;
-  }
-}
+// Mirrors the old flex `justify-content: space-between`: fixed gaps between
+// the address + byte groups. Rows with fewer than 4 groups right-align
+// instead of stretching (as the old layout did).
+const gap = (W - PAD * 2 - (ADDR_CHARS + GROUPS * GROUP_CHARS) * CH) / GROUPS;
+
+const groupX = (slots: number, k: number): number => {
+  const v = GROUPS - (slots - 1) + k;
+  return PAD + ADDR_CHARS * CH + (v + 1) * gap + v * GROUP_CHARS * CH;
+};
+
+const tile = (animated: boolean): string => {
+  const rows = HEX_ROWS.map(([addr, groups], i) => {
+    const cells = groups.flatMap((g) => g.split(" "));
+    const y = (i * LINE + 19).toFixed(2);
+    const tspans = [
+      `<tspan x="${PAD}" fill="rgba(100,116,139,0.22)">/.. ${addr}</tspan>`,
+      ...groups.map(
+        (g, k) =>
+          `<tspan x="${groupX(groups.length, k).toFixed(2)}">${g}</tspan>`,
+      ),
+    ].join("");
+
+    let out = `<text y="${y}">${tspans}</text>`;
+
+    // Same staggered "lit byte" recipe as before: one cell in every other row.
+    if (animated && i % 2 === 0) {
+      const lit = (i * 7) % cells.length;
+      const byteX = groupX(groups.length, Math.floor(lit / 4)) + (lit % 4) * 3 * CH;
+
+      out += `<text x="${byteX.toFixed(2)}" y="${y}" opacity="0" fill="rgba(203,213,225,0.9)">${cells[lit]}<animate attributeName="opacity" values="0;1;0" keyTimes="0;0.5;1" calcMode="spline" keySplines="0.42 0 0.58 1;0.42 0 0.58 1" begin="${((i * 0.6) % 4.2).toFixed(1)}s" dur="${DURATIONS[i % DURATIONS.length]}s" repeatCount="indefinite"/></text>`;
+    }
+
+    return out;
+  }).join("");
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${HEX_ROWS.length * LINE}" fill="rgba(148,163,184,0.16)" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="14">${rows}</svg>`;
+};
+
+const dataUri = (svg: string): string =>
+  `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+
+const animated = dataUri(tile(true));
+const still = dataUri(tile(false));
 ---
 
-<div id="hexdump" aria-hidden="true" class="hexdump">
-  {
-    hexRows.map((row) => {
-      let idx = 0;
-      return (
-        <div class="hexrow">
-          <span class="addr">/.. {row.addr}</span>
-          {row.groups.map((g) => (
-            <span class="hgroup">
-              {g.split(" ").map((b) => {
-                const isLit = idx === row.litIndex;
-                const style = isLit
-                  ? `animation-delay:${row.delay}s;animation-duration:${row.dur}s`
-                  : undefined;
-                idx++;
-                return (
-                  <span class={isLit ? "cell lit" : "cell"} style={style}>
-                    {b}
-                  </span>
-                );
-              })}
-            </span>
-          ))}
-        </div>
-      );
-    })
+<style define:vars={{ animated, still }}>
+  .hexdump {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    background-image: var(--animated);
+    background-repeat: repeat-y;
+    background-position: 50% 0.75rem;
+    -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 97%);
+    mask-image: linear-gradient(to bottom, black 55%, transparent 97%);
   }
-</div>
+
+  @media (prefers-reduced-motion: reduce) {
+    .hexdump {
+      background-image: var(--still);
+    }
+  }
+</style>
+
+<div class="hexdump" aria-hidden="true"></div>
