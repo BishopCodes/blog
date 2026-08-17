@@ -1,7 +1,8 @@
 ---
+
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -15,7 +16,9 @@
       // breakpoint mid-animation) can't cause the intro to re-trigger.
       (function () {
         var isMobile = window.matchMedia("(max-width: 640px)").matches;
-        document.documentElement.classList.add(isMobile ? "is-mobile" : "is-desktop");
+        document.documentElement.classList.add(
+          isMobile ? "is-mobile" : "is-desktop",
+        );
       })();
     </script>
     <noscript>
@@ -29,13 +32,27 @@
             opacity: 0;
             animation: line-in 0.35s ease-out forwards;
           }
-          .terminal .line-1 { animation-delay: 0.1s; }
-          .terminal .line-2 { animation-delay: 0.3s; }
-          .terminal .line-3 { animation-delay: 0.5s; }
-          .terminal .line-4 { animation-delay: 0.7s; }
-          .terminal .line-5 { animation-delay: 0.9s; }
-          .glitch-wrap { animation-delay: 1.25s; }
-          .message { animation-delay: 1.4s; }
+          .terminal .line-1 {
+            animation-delay: 0.1s;
+          }
+          .terminal .line-2 {
+            animation-delay: 0.3s;
+          }
+          .terminal .line-3 {
+            animation-delay: 0.5s;
+          }
+          .terminal .line-4 {
+            animation-delay: 0.7s;
+          }
+          .terminal .line-5 {
+            animation-delay: 0.9s;
+          }
+          .glitch-wrap {
+            animation-delay: 1.25s;
+          }
+          .message {
+            animation-delay: 1.4s;
+          }
         }
       </style>
     </noscript>
@@ -49,14 +66,19 @@
         --blue-glitch: #2bd7ff;
         --muted: #6b756e;
       }
-      * { box-sizing: border-box; }
-      html, body {
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
         margin: 0;
         padding: 0;
         height: 100%;
         background: var(--bg);
         color: var(--fg);
-        font-family: 'JetBrains Mono', 'Fira Code', 'SFMono-Regular', Consolas, Menlo, monospace;
+        font-family:
+          "JetBrains Mono", "Fira Code", "SFMono-Regular", Consolas, Menlo,
+          monospace;
         overflow-x: hidden;
       }
       body {
@@ -87,7 +109,11 @@
         position: fixed;
         inset: 0;
         pointer-events: none;
-        background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.55) 100%);
+        background: radial-gradient(
+          ellipse at center,
+          transparent 60%,
+          rgba(0, 0, 0, 0.55) 100%
+        );
         z-index: 4;
       }
       .terminal {
@@ -105,16 +131,31 @@
         color: var(--green-dim);
         border-right: 2px solid transparent;
       }
-      .terminal .path { color: var(--green); }
-      .terminal .err { color: var(--red-glitch); }
-      .terminal .ok { color: var(--muted); }
+      .terminal .path {
+        color: var(--green);
+      }
+      .terminal .err {
+        color: var(--red-glitch);
+      }
+      .terminal .ok {
+        color: var(--muted);
+      }
       @keyframes blink-caret {
-        0%, 100% { border-right-color: var(--green); }
-        50% { border-right-color: transparent; }
+        0%,
+        100% {
+          border-right-color: var(--green);
+        }
+        50% {
+          border-right-color: transparent;
+        }
       }
       @keyframes type-line {
-        from { width: 0ch; }
-        to { width: min(var(--type-w, 100%), 100%); }
+        from {
+          width: 0ch;
+        }
+        to {
+          width: min(var(--type-w, 100%), 100%);
+        }
       }
       /* Intro sequence run at ~2x the original speed */
       .line-1 {
@@ -151,9 +192,18 @@
         animation: reveal-pop 0.35s ease-out 5.15s forwards;
       }
       @keyframes reveal-pop {
-        0%   { opacity: 0; transform: scale(0.96); }
-        60%  { opacity: 1; transform: scale(1.01); }
-        100% { opacity: 1; transform: scale(1); }
+        0% {
+          opacity: 0;
+          transform: scale(0.96);
+        }
+        60% {
+          opacity: 1;
+          transform: scale(1.01);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
       }
       .glitch {
         position: relative;
@@ -189,36 +239,127 @@
         animation: glitch-blue 6.7s infinite;
       }
       @keyframes glitch-jitter {
-        0%, 9.4%, 10.8%, 44.2%, 45.4%, 78.2%, 79.6%, 100% { transform: translate(0, 0); }
-        9.6%  { transform: translate(-2px, 1px); }
-        10.1% { transform: translate(2px, -1px); }
-        10.5% { transform: translate(-1px, 0); }
-        44.4% { transform: translate(2px, 1px); }
-        44.9% { transform: translate(-2px, -1px); }
-        78.4% { transform: translate(-1px, 1px); }
-        78.9% { transform: translate(2px, 0); }
+        0%,
+        9.4%,
+        10.8%,
+        44.2%,
+        45.4%,
+        78.2%,
+        79.6%,
+        100% {
+          transform: translate(0, 0);
+        }
+        9.6% {
+          transform: translate(-2px, 1px);
+        }
+        10.1% {
+          transform: translate(2px, -1px);
+        }
+        10.5% {
+          transform: translate(-1px, 0);
+        }
+        44.4% {
+          transform: translate(2px, 1px);
+        }
+        44.9% {
+          transform: translate(-2px, -1px);
+        }
+        78.4% {
+          transform: translate(-1px, 1px);
+        }
+        78.9% {
+          transform: translate(2px, 0);
+        }
       }
       @keyframes glitch-red {
-        0%, 9%, 10.4%, 44%, 45.1%, 78%, 79.3%, 100% { clip-path: inset(0 0 100% 0); transform: translate(0, 0); }
-        9.2%  { clip-path: inset(15% 0 70% 0); transform: translate(-6px, -2px); }
-        9.6%  { clip-path: inset(40% 0 40% 0); transform: translate(5px, 1px); }
-        10.0% { clip-path: inset(5% 0 85% 0); transform: translate(-4px, 2px); }
-        44.3% { clip-path: inset(60% 0 10% 0); transform: translate(6px, -1px); }
-        44.7% { clip-path: inset(25% 0 55% 0); transform: translate(-5px, 2px); }
-        78.3% { clip-path: inset(70% 0 5% 0); transform: translate(4px, 2px); }
-        78.6% { clip-path: inset(10% 0 75% 0); transform: translate(-6px, -1px); }
-        78.9% { clip-path: inset(45% 0 35% 0); transform: translate(5px, -2px); }
+        0%,
+        9%,
+        10.4%,
+        44%,
+        45.1%,
+        78%,
+        79.3%,
+        100% {
+          clip-path: inset(0 0 100% 0);
+          transform: translate(0, 0);
+        }
+        9.2% {
+          clip-path: inset(15% 0 70% 0);
+          transform: translate(-6px, -2px);
+        }
+        9.6% {
+          clip-path: inset(40% 0 40% 0);
+          transform: translate(5px, 1px);
+        }
+        10.0% {
+          clip-path: inset(5% 0 85% 0);
+          transform: translate(-4px, 2px);
+        }
+        44.3% {
+          clip-path: inset(60% 0 10% 0);
+          transform: translate(6px, -1px);
+        }
+        44.7% {
+          clip-path: inset(25% 0 55% 0);
+          transform: translate(-5px, 2px);
+        }
+        78.3% {
+          clip-path: inset(70% 0 5% 0);
+          transform: translate(4px, 2px);
+        }
+        78.6% {
+          clip-path: inset(10% 0 75% 0);
+          transform: translate(-6px, -1px);
+        }
+        78.9% {
+          clip-path: inset(45% 0 35% 0);
+          transform: translate(5px, -2px);
+        }
       }
       @keyframes glitch-blue {
-        0%, 14.5%, 16%, 51.5%, 52.7%, 87%, 88.4%, 100% { clip-path: inset(0 0 100% 0); transform: translate(0, 0); }
-        14.7% { clip-path: inset(55% 0 15% 0); transform: translate(5px, 2px); }
-        15.1% { clip-path: inset(20% 0 60% 0); transform: translate(-5px, -1px); }
-        15.5% { clip-path: inset(80% 0 5% 0); transform: translate(4px, 1px); }
-        51.8% { clip-path: inset(10% 0 78% 0); transform: translate(-4px, 2px); }
-        52.2% { clip-path: inset(48% 0 32% 0); transform: translate(6px, -2px); }
-        87.2% { clip-path: inset(65% 0 12% 0); transform: translate(-5px, 1px); }
-        87.6% { clip-path: inset(30% 0 50% 0); transform: translate(4px, -1px); }
-        88.0% { clip-path: inset(5% 0 88% 0); transform: translate(-6px, 2px); }
+        0%,
+        14.5%,
+        16%,
+        51.5%,
+        52.7%,
+        87%,
+        88.4%,
+        100% {
+          clip-path: inset(0 0 100% 0);
+          transform: translate(0, 0);
+        }
+        14.7% {
+          clip-path: inset(55% 0 15% 0);
+          transform: translate(5px, 2px);
+        }
+        15.1% {
+          clip-path: inset(20% 0 60% 0);
+          transform: translate(-5px, -1px);
+        }
+        15.5% {
+          clip-path: inset(80% 0 5% 0);
+          transform: translate(4px, 1px);
+        }
+        51.8% {
+          clip-path: inset(10% 0 78% 0);
+          transform: translate(-4px, 2px);
+        }
+        52.2% {
+          clip-path: inset(48% 0 32% 0);
+          transform: translate(6px, -2px);
+        }
+        87.2% {
+          clip-path: inset(65% 0 12% 0);
+          transform: translate(-5px, 1px);
+        }
+        87.6% {
+          clip-path: inset(30% 0 50% 0);
+          transform: translate(4px, -1px);
+        }
+        88.0% {
+          clip-path: inset(5% 0 88% 0);
+          transform: translate(-6px, 2px);
+        }
       }
       .message {
         text-align: center;
@@ -227,8 +368,14 @@
         animation: fade-in 0.4s ease-out 5.3s forwards;
       }
       @keyframes fade-in {
-        from { opacity: 0; transform: translateY(4px); }
-        to   { opacity: 1; transform: translateY(0); }
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
       .message h2 {
         font-size: 1.1rem;
@@ -252,7 +399,10 @@
         border: 1px solid var(--green-dim);
         padding: 0.6rem 1.2rem;
         border-radius: 2px;
-        transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+        transition:
+          background 0.15s ease,
+          color 0.15s ease,
+          box-shadow 0.15s ease;
       }
       .home-link:hover {
         background: var(--green);
@@ -263,8 +413,12 @@
         content: "→";
       }
       @keyframes line-in {
-        from { opacity: 0; }
-        to   { opacity: 1; }
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
       }
       /* Mobile intro sequence — gated on the load-time class from the head
          script, not a live media query, so it can't be re-triggered by a
@@ -277,34 +431,64 @@
         opacity: 0;
         animation: line-in 0.35s ease-out forwards;
       }
-      html.is-mobile .terminal .line-1 { animation-delay: 0.1s; }
-      html.is-mobile .terminal .line-2 { animation-delay: 0.3s; }
-      html.is-mobile .terminal .line-3 { animation-delay: 0.5s; }
-      html.is-mobile .terminal .line-4 { animation-delay: 0.7s; }
-      html.is-mobile .terminal .line-5 { animation-delay: 0.9s; }
-      html.is-mobile .glitch-wrap { animation-delay: 1.25s; }
-      html.is-mobile .message { animation-delay: 1.4s; }
+      html.is-mobile .terminal .line-1 {
+        animation-delay: 0.1s;
+      }
+      html.is-mobile .terminal .line-2 {
+        animation-delay: 0.3s;
+      }
+      html.is-mobile .terminal .line-3 {
+        animation-delay: 0.5s;
+      }
+      html.is-mobile .terminal .line-4 {
+        animation-delay: 0.7s;
+      }
+      html.is-mobile .terminal .line-5 {
+        animation-delay: 0.9s;
+      }
+      html.is-mobile .glitch-wrap {
+        animation-delay: 1.25s;
+      }
+      html.is-mobile .message {
+        animation-delay: 1.4s;
+      }
 
       /* Pure sizing tweaks below — safe to stay as live media queries since
          they don't touch animation-name/timing and so can't cause replay. */
       @media (max-width: 480px) {
-        .terminal { font-size: 0.72rem; }
-        .glitch { font-size: clamp(3.75rem, 24vw, 7rem); }
-        .glitch-wrap { margin: 0.35rem 0 1rem; }
-        .message p { font-size: 0.82rem; }
+        .terminal {
+          font-size: 0.72rem;
+        }
+        .glitch {
+          font-size: clamp(3.75rem, 24vw, 7rem);
+        }
+        .glitch-wrap {
+          margin: 0.35rem 0 1rem;
+        }
+        .message p {
+          font-size: 0.82rem;
+        }
       }
     </style>
   </head>
   <body>
     <div class="terminal">
-      <div class="line line-1"><span class="path">bishop@codes:~$</span> curl -sf \</div>
-      <div class="line line-2">&nbsp;&nbsp;https://bishopcodes.com<span class="req">/this-page</span> \</div>
+      <div class="line line-1">
+        <span class="path">bishop@codes:~$</span> curl -sf \
+      </div>
+      <div class="line line-2">
+        &nbsp;&nbsp;https://bishopcodes.com<span class="req">/this-page</span> \
+      </div>
       <div class="line line-3">&nbsp;&nbsp;|| handle_http_error $?</div>
       <div class="line line-4">
-        <span class="err">curl: (22) The requested URL returned error: 404 Not Found</span>
+        <span class="err"
+          >curl: (22) The requested URL returned error: 404 Not Found</span
+        >
       </div>
       <div class="line line-5">
-        <span class="ok">handle_http_error: caught 404, dispatching renderer...</span>
+        <span class="ok"
+          >handle_http_error: caught 404, dispatching renderer...</span
+        >
       </div>
     </div>
     <div class="glitch-wrap">
@@ -313,15 +497,15 @@
     <div class="message">
       <h2>segmentation fault (page not found)</h2>
       <p>
-        Whatever you were looking for got moved, renamed, or never existed. Let's get
-        you back to somewhere that compiles.
+        Whatever you were looking for got moved, renamed, or never existed.
+        Let's get you back to somewhere that compiles.
       </p>
       <a class="home-link" href="/">cd ~</a>
     </div>
     <script>
       const req = document.querySelector(".req");
       if (req) req.textContent = location.pathname;
-      for (const line of document.querySelectorAll(".terminal .line")) {
+      for (const line of document.querySelectorAll<HTMLElement>(".terminal .line")) {
         const t = line.textContent || "";
         line.style.setProperty("--type-w", t.length + 1 + "ch");
       }

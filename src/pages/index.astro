@@ -3,7 +3,7 @@ import Layout from "@/layouts/Layout.astro";
 import { getCollection } from "astro:content";
 
 const posts = (await getCollection("blog")).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 );
 
 const tagClassMap = new Map([
@@ -20,8 +20,9 @@ const tagClassMap = new Map([
 >
   <section class="mb-14">
     <p class="text-sm text-neutral-500">
-      <span class="text-green-400">~</span><span class="ml-1 text-blue-400">$</span
-      ><span class="text-white ml-1">./blog.sh</span>
+      <span class="text-green-400">~</span><span class="ml-1 text-blue-400"
+        >$</span
+      ><span class="ml-1 text-white">./blog.sh</span>
     </p>
     <h1 class="shimmer mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
       BishopCodes
@@ -31,7 +32,7 @@ const tagClassMap = new Map([
     </p>
   </section>
 
-  <h2 class="mb-4 text-xs uppercase tracking-widest text-neutral-500">
+  <h2 class="mb-4 text-xs tracking-widest text-neutral-500 uppercase">
     Recent posts
   </h2>
 

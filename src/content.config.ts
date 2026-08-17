@@ -1,14 +1,16 @@
-import { defineCollection } from 'astro:content';
-import { z } from 'astro/zod';
-import { glob } from 'astro/loaders';
+import { defineCollection } from "astro:content";
+import { z } from "astro/zod";
+import { glob } from "astro/loaders";
 
 const blog = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/blog' }),
+  loader: glob({ pattern: "**/*.md", base: "./src/content/blog" }),
   schema: z.object({
     title: z.string(),
     description: z.string(),
     date: z.coerce.date(),
-    tag: z.enum(['code', 'rant', 'architecture', 'opinion', 'talk']).default('talk'),
+    tag: z
+      .enum(["code", "rant", "architecture", "opinion", "talk"])
+      .default("talk"),
   }),
 });
 

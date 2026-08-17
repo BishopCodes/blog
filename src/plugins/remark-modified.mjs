@@ -10,10 +10,11 @@ export function remarkModified() {
 
     try {
       const filepath = file.history[0];
-      modified = execSync(
-        `git log -1 --pretty="format:%cI" -- "${filepath}"`,
-        { stdio: "pipe" }
-      ).toString().trim();
+      modified = execSync(`git log -1 --pretty="format:%cI" -- "${filepath}"`, {
+        stdio: "pipe",
+      })
+        .toString()
+        .trim();
     } catch {
       // untracked file or no git history yet
     }

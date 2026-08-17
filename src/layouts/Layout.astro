@@ -1,26 +1,19 @@
 ---
 import "@/styles/global.css";
 import HexDump from "@/components/hexdump.astro";
-import {OgImage} from "@imagekit/astro";
-import type { MarkdownLayoutProps } from 'astro';
-
+import { OgImage } from "@imagekit/astro";
+import { type Post } from "@/types/collections";
 
 interface Props {
   title: string;
-  url: string;
+  frontmatter?: Post["data"];
+  ogType?: "website" | "article"
 }
 
-type Props = MarkdownLayoutProps<{
-  title: string;
-  description: string;
-  date: string;
-  tag: string;
-}>;
-
-const { title, frontmatter, url, ogType } = Astro.props;
+const { title, frontmatter, ogType } = Astro.props;
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" class="bg-neutral-950">
   <head>
     <meta charset="UTF-8" />
@@ -31,10 +24,8 @@ const { title, frontmatter, url, ogType } = Astro.props;
       title={title}
       description={frontmatter?.description}
       type={ogType || "website"}
-      url={url}
     />
     <title>{title}</title>
-
   </head>
 
   <body
@@ -47,7 +38,9 @@ const { title, frontmatter, url, ogType } = Astro.props;
     <header
       class="sticky top-0 z-10 border-b border-neutral-800/70 bg-neutral-950/70 backdrop-blur-[2px]"
     >
-      <div class="mx-auto flex max-w-4xl flex-col gap-2 px-6 py-5 sm:flex-row sm:items-center">
+      <div
+        class="mx-auto flex max-w-4xl flex-col gap-2 px-6 py-5 sm:flex-row sm:items-center"
+      >
         <a
           href="/"
           class="shrink-0 text-lg font-bold tracking-tight"
@@ -62,7 +55,7 @@ const { title, frontmatter, url, ogType } = Astro.props;
         <form
           id="orama-search"
           role="search"
-          class="group relative min-w-0 w-full after:absolute after:bottom-0 after:left-1 after:right-0 after:h-px after:bg-neutral-700 after:transition-opacity focus-within:after:opacity-0 sm:flex-1 sm:w-2/4"
+          class="group relative w-full min-w-0 after:absolute after:right-0 after:bottom-0 after:left-1 after:h-px after:bg-neutral-700 after:transition-opacity focus-within:after:opacity-0 sm:w-2/4 sm:flex-1"
         >
           <input
             type="search"
@@ -121,7 +114,7 @@ const { title, frontmatter, url, ogType } = Astro.props;
         const form = document.querySelector<HTMLFormElement>("#orama-search");
         const input = form?.querySelector<HTMLInputElement>("input");
         const results = document.querySelector<HTMLUListElement>(
-          "#orama-search-results"
+          "#orama-search-results",
         );
 
         if (!form || !input || !results) return;

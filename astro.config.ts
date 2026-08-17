@@ -1,17 +1,17 @@
 import { remarkModified } from "@/plugins/remark-modified.mjs";
-import { remarkReadingTime } from '@/plugins/remark-reading-time.mjs';
-import { unified } from '@astrojs/markdown-remark';
-import tailwindcss from '@tailwindcss/vite';
+import { remarkReadingTime } from "@/plugins/remark-reading-time.mjs";
+import { unified } from "@astrojs/markdown-remark";
+import tailwindcss from "@tailwindcss/vite";
 import umami from "@yeskunall/astro-umami";
-import { defineConfig } from 'astro/config';
-import rehypeExternalLinks from 'rehype-external-links';
-import imagekit from '@imagekit/astro/integration';
+import { defineConfig } from "astro/config";
+import rehypeExternalLinks from "rehype-external-links";
+import imagekit from "@imagekit/astro/integration";
 
-import sitemap from '@astrojs/sitemap';
+import sitemap from "@astrojs/sitemap";
 
 export default defineConfig({
   vite: { plugins: [tailwindcss()] },
-  site: 'https://bishopcodes.github.io',
+  site: "https://bishopcodes.github.io",
 
   markdown: {
     processor: unified({
@@ -19,14 +19,18 @@ export default defineConfig({
         [
           rehypeExternalLinks,
           {
-            content: { type: 'text', value: ' 🔗' }
-          }
-        ]
+            content: { type: "text", value: " 🔗" },
+          },
+        ],
       ],
-      remarkPlugins: [remarkModified, remarkReadingTime]
-    })
+      remarkPlugins: [remarkModified, remarkReadingTime],
+    }),
   },
-  integrations: [sitemap(), umami({ id: "a3d374e3-89d8-4950-bd77-49ee88887ab7" }), imagekit({
-    urlEndpoint: "https://ik.imagekit.io/dl8mble2sh"
-  })]
+  integrations: [
+    sitemap(),
+    umami({ id: "a3d374e3-89d8-4950-bd77-49ee88887ab7" }),
+    imagekit({
+      urlEndpoint: "https://ik.imagekit.io/dl8mble2sh",
+    }),
+  ],
 });

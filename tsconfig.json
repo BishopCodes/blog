@@ -1,24 +1,21 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": [
-    ".astro/types.d.ts",
-    "**/*"
-  ],
   "exclude": [
     "dist"
   ],
-    "compilerOptions": {
-      "paths": {
-        "@/*": [
-          "./src/*"
-        ]
-      },
+  "compilerOptions": {
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+    },
     "strictNullChecks": true,
     "allowJs": true,
     "plugins": [
       {
         "name": "@astrojs/ts-plugin"
       }
-    ]
+    ],
+    "verbatimModuleSyntax": true
   }
 }

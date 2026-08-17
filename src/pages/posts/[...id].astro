@@ -34,8 +34,19 @@ const tagClassMap = {
   opinion: "text-teal-400",
   talk: "text-neutral-200",
 };
+
 ---
 
-<Layout title={`${post.data.title} — BishopCodes`} frontmatter={{...post.data, id: post.id, tagClass: tagClassMap[post.data.tag], createdOn: createdOn, lastModified: lastModified, minutesRead: remarkPluginFrontmatter.minutesRead}} >
+<Layout
+  title={`${post.data.title} — BishopCodes`}
+  frontmatter={{
+    ...post.data,
+    id: post.id,
+    tagClass: tagClassMap[post.data.tag],
+    createdOn: createdOn,
+    lastModified: lastModified,
+    minutesRead: remarkPluginFrontmatter.minutesRead,
+  }}
+>
   <Content />
 </Layout>
