@@ -25,6 +25,7 @@ const createdOn = post.data.date.toLocaleDateString("en-US", {
   year: "numeric",
   month: "short",
   day: "numeric",
+  timeZone: "UTC",
 });
 
 const tagClassMap = {
@@ -34,7 +35,6 @@ const tagClassMap = {
   opinion: "text-teal-400",
   talk: "text-neutral-200",
 };
-
 ---
 
 <Layout

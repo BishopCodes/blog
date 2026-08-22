@@ -11,6 +11,7 @@
     "dev": "astro dev",
     "build": "astro check && astro build",
     "preview": "astro preview",
+    "generate:hex": "node scripts/generate-hex-tile.mjs",
     "sync": "astro sync"
   },
   "dependencies": {

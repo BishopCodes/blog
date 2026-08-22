@@ -6,6 +6,37 @@ const posts = (await getCollection("blog")).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
 );
 
+interface MonthGroup {
+  key: string;
+  label: string;
+  posts: typeof posts;
+}
+
+const months: MonthGroup[] = [];
+let current: MonthGroup | undefined;
+
+for (const post of posts) {
+  // Source dates are UTC midnight (date-only frontmatter); derive everything in
+  // UTC so grouping/labels never shift with the build machine's timezone.
+  const iso = post.data.date.toISOString();
+  const key = iso.slice(0, 7);
+
+  if (!current || current.key !== key) {
+    current = {
+      key,
+      label: post.data.date.toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC",
+      }),
+      posts: [],
+    };
+    months.push(current);
+  }
+
+  current.posts.push(post);
+}
+
 const tagClassMap = new Map([
   ["code", "text-cyan-400"],
   ["rant", "text-red-400"],
@@ -32,42 +63,132 @@ const tagClassMap = new Map([
     </p>
   </section>
 
-  <h2 class="mb-4 text-xs tracking-widest text-neutral-500 uppercase">
-    Recent posts
-  </h2>
+  <p class="mb-8 text-sm text-neutral-500">
+    <span class="text-green-400">~</span><span class="ml-1 text-blue-400"
+      >$</span
+    ><span class="ml-1 text-white">ls -lt ./posts</span>
+  </p>
 
-  <ul class="space-y-4">
+  <div class="space-y-12">
     {
-      posts.map((post) => (
-        <li>
-          <a
-            href={`/posts/${post.id}/`}
-            class="group block rounded-xl border border-neutral-800 bg-neutral-900/40 p-5 backdrop-blur-[2px] transition-colors hover:border-blue-400/40 hover:bg-neutral-900/70"
-          >
-            <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-              <span class={tagClassMap.get(post.data.tag)}>
-                [{post.data.tag}]
-              </span>
-              <time
-                class="text-neutral-500"
-                datetime={post.data.date.toISOString()}
-              >
-                {post.data.date.toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </time>
-            </div>
-            <h3 class="mt-2 text-lg font-semibold text-white transition-colors group-hover:text-blue-300">
-              {post.data.title}
-            </h3>
-            <p class="mt-1.5 text-sm text-neutral-400">
-              {post.data.description}
-            </p>
-          </a>
-        </li>
+      months.map((month) => (
+        <section data-month={month.key} id={`m-${month.key}`}>
+          <h2 class="mb-4 text-sm font-semibold tracking-widest text-neutral-400 uppercase">
+            {month.label}
+          </h2>
+          <ul class="space-y-4">
+            {month.posts.map((post) => (
+              <li>
+                <a
+                  href={`/posts/${post.id}/`}
+                  class="group block rounded-xl border border-neutral-800 bg-neutral-900/40 p-5 backdrop-blur-[2px] transition-colors hover:border-blue-400/40 hover:bg-neutral-900/70"
+                >
+                  <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+                    <span class={tagClassMap.get(post.data.tag)}>
+                      [{post.data.tag}]
+                    </span>
+                    <time
+                      class="text-neutral-500"
+                      datetime={post.data.date.toISOString()}
+                    >
+                      {post.data.date.toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        timeZone: "UTC",
+                      })}
+                    </time>
+                  </div>
+                  <h3 class="mt-2 text-lg font-semibold text-white transition-colors group-hover:text-blue-300">
+                    {post.data.title}
+                  </h3>
+                  <p class="mt-1.5 text-sm text-neutral-400">
+                    {post.data.description}
+                  </p>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
       ))
     }
-  </ul>
+  </div>
+
+  <div data-load-more aria-hidden="true" class="mt-12 h-px"></div>
+
+  <script>
+    const initArchive = () => {
+      const sections = [
+        ...document.querySelectorAll<HTMLElement>("[data-month]"),
+      ];
+      const sentinel = document.querySelector<HTMLElement>("[data-load-more]");
+
+      if (!sentinel || sections.length < 2) return;
+
+      const fitsOneScreen =
+        document.documentElement.scrollHeight <= window.innerHeight;
+
+      if (fitsOneScreen) {
+        sentinel.remove();
+        return;
+      }
+
+      sections
+        .slice(1)
+        .forEach((section) => section.setAttribute("hidden", ""));
+
+      let hasScrolled = false;
+
+      window.addEventListener(
+        "scroll",
+        () => {
+          hasScrolled = true;
+        },
+        { once: true, passive: true },
+      );
+
+      const revealNext = () => {
+        const next = sections.find((section) => section.hasAttribute("hidden"));
+
+        if (!next) {
+          sentinel.remove();
+          return;
+        }
+
+        next.removeAttribute("hidden");
+
+        if (!sections.some((section) => section.hasAttribute("hidden"))) {
+          sentinel.remove();
+        }
+      };
+
+      const sentinelInView = () =>
+        sentinel.getBoundingClientRect().top < window.innerHeight;
+
+      let extraAllowed = true;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+          if (!hasScrolled) return;
+
+          revealNext();
+
+          if (!sentinel.isConnected || !sentinelInView() || !extraAllowed)
+            return;
+
+          extraAllowed = false;
+
+          window.setTimeout(() => {
+            revealNext();
+            extraAllowed = true;
+          }, 150);
+        },
+        { rootMargin: "150px 0px" },
+      );
+
+      observer.observe(sentinel);
+    };
+
+    initArchive();
+  </script>
 </Layout>

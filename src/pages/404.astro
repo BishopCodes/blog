@@ -453,6 +453,39 @@
         animation-delay: 1.4s;
       }
 
+      /* Reduced motion: show everything immediately, no jitter/typing/glitch.
+         The is-mobile variants are restated so this also wins over the
+         load-time class rules. */
+      @media (prefers-reduced-motion: reduce) {
+        .terminal .line,
+        html.is-mobile .terminal .line {
+          animation: none;
+          width: 100%;
+          white-space: normal;
+          opacity: 1;
+        }
+        .glitch,
+        .glitch::before,
+        .glitch::after {
+          animation: none;
+        }
+        .glitch::before,
+        .glitch::after {
+          clip-path: inset(0 0 100% 0);
+        }
+        .glitch-wrap,
+        html.is-mobile .glitch-wrap {
+          animation: none;
+          opacity: 1;
+          transform: none;
+        }
+        .message,
+        html.is-mobile .message {
+          animation: none;
+          opacity: 1;
+        }
+      }
+
       /* Pure sizing tweaks below — safe to stay as live media queries since
          they don't touch animation-name/timing and so can't cause replay. */
       @media (max-width: 480px) {
@@ -505,7 +538,9 @@
     <script>
       const req = document.querySelector(".req");
       if (req) req.textContent = location.pathname;
-      for (const line of document.querySelectorAll<HTMLElement>(".terminal .line")) {
+      for (const line of document.querySelectorAll<HTMLElement>(
+        ".terminal .line",
+      )) {
         const t = line.textContent || "";
         line.style.setProperty("--type-w", t.length + 1 + "ch");
       }

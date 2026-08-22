@@ -7,7 +7,7 @@ import { type Post } from "@/types/collections";
 interface Props {
   title: string;
   frontmatter?: Post["data"];
-  ogType?: "website" | "article"
+  ogType?: "website" | "article";
 }
 
 const { title, frontmatter, ogType } = Astro.props;
@@ -63,7 +63,6 @@ const { title, frontmatter, ogType } = Astro.props;
             aria-controls="orama-search-results"
             aria-expanded="false"
             aria-autocomplete="list"
-            autofocus
             class="w-full min-w-0 appearance-none bg-transparent pl-1 text-lg text-neutral-100 caret-white outline-none"
           />
 
@@ -122,33 +121,43 @@ const { title, frontmatter, ogType } = Astro.props;
         let activeIndex = -1;
         let searchRequest = 0;
 
-        const dbPromise = (async () => {
-          const [{ create, load }, response] = await Promise.all([
-            import("@orama/orama"),
-            fetch("/search-index.json"),
-          ]);
+        // Deferred on purpose: the 76 KB orama chunk and 76 KB index only ship to
+        // sessions that actually search, not to every page view.
+        let dbPromise: Promise<any> | undefined;
 
-          if (!response.ok) {
-            throw new Error(`Unable to load search index: ${response.status}`);
-          }
+        const getDb = () => {
+          dbPromise ??= (async () => {
+            const [{ create, load }, response] = await Promise.all([
+              import("@orama/orama"),
+              fetch("/search-index.json"),
+            ]);
 
-          const serialized = await response.json();
+            if (!response.ok) {
+              throw new Error(
+                `Unable to load search index: ${response.status}`,
+              );
+            }
 
-          const db = create({
-            schema: {
-              id: "string",
-              title: "string",
-              description: "string",
-              content: "string",
-              tag: "string",
-              path: "string",
-            },
-          });
+            const serialized = await response.json();
 
-          load(db, serialized);
+            const db = create({
+              schema: {
+                id: "string",
+                title: "string",
+                description: "string",
+                content: "string",
+                tag: "string",
+                path: "string",
+              },
+            });
 
-          return db;
-        })();
+            load(db, serialized);
+
+            return db;
+          })();
+
+          return dbPromise;
+        };
 
         const getLinks = () => results.querySelectorAll<HTMLAnchorElement>("a");
 
@@ -235,7 +244,7 @@ const { title, frontmatter, ogType } = Astro.props;
           try {
             const [{ search: oramaSearch }, db] = await Promise.all([
               import("@orama/orama"),
-              dbPromise,
+              getDb(),
             ]);
 
             if (requestId !== searchRequest) return;

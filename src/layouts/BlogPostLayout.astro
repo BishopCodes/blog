@@ -1,4 +1,5 @@
 ---
+import Giscus from "@/components/giscus.astro";
 import { type Post } from "@/types/collections";
 import BaseLayout from "./Layout.astro";
 
@@ -10,8 +11,7 @@ type PostFrontMatter = PostData & {
   createdOn: string;
   lastModified: string;
   minutesRead: string;
-}
-
+};
 
 interface Props {
   title: string;
@@ -21,11 +21,7 @@ interface Props {
 const { title, frontmatter } = Astro.props;
 ---
 
-<BaseLayout
-  title={title}
-  frontmatter={frontmatter}
-  ogType="article"
->
+<BaseLayout title={title} frontmatter={frontmatter} ogType="article">
   <a
     href="/"
     aria-label="Back to all posts"
@@ -88,21 +84,5 @@ const { title, frontmatter } = Astro.props;
       <span class="ml-2">cd ..</span>
     </a>
   </div>
-  <script
-    is:inline
-    src="https://giscus.app/client.js"
-    data-repo="bishopcodes/blog"
-    data-repo-id="R_kgDOT5sf7Q"
-    data-category="General"
-    data-category-id="DIC_kwDOT5sf7c4DDeas"
-    data-mapping="pathname"
-    data-strict="0"
-    data-reactions-enabled="1"
-    data-emit-metadata="0"
-    data-input-position="top"
-    data-theme="noborder_dark"
-    data-lang="en"
-    data-loading="lazy"
-    crossorigin="anonymous"
-    async></script>
+  <Giscus />
 </BaseLayout>

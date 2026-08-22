@@ -66,77 +66,9 @@ body::before {
     );
 }
 
-.hexdump {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  /* pointer-events: none; */
-  overflow: hidden;
-  padding-top: 0.75rem;
-  font-size: clamp(11px, 1.05vw, 14px);
-  line-height: calc(1.15em + 11px);
-  letter-spacing: 0.02em;
-  color: rgba(148, 163, 184, 0.16);
-  -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 97%);
-  mask-image: linear-gradient(to bottom, black 55%, transparent 97%);
-}
-
-.hexrow {
-  display: flex;
-  justify-content: space-between;
-  /* ponytail: cap row width so the address/byte columns don't stretch
-     across full ultrawide screens; gap stays fixed and even */
-  width: min(100%, 110ch);
-  margin-inline: auto;
-  padding: 0 1.5rem;
-}
-
-.hexrow .addr {
-  color: rgba(100, 116, 139, 0.22);
-}
-
-.hexrow:hover .addr {
-  color: rgba(125, 140, 164, 0.55);
-}
-.hexrow:hover .cell {
-  color: rgba(203, 213, 225, 0.5);
-}
-
-.hgroup {
-  display: flex;
-  gap: 1ch;
-}
-
-.cell {
-  transition: color 0.15s ease;
-}
-
-.cell.lit {
-  animation-name: bytePulse;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-}
-
-@keyframes bytePulse {
-  0% {
-    color: rgba(148, 163, 184, 0.16);
-    text-shadow: none;
-  }
-  40%,
-  60% {
-    color: rgba(203, 213, 225, 0.85);
-    text-shadow: 0 0 6px rgba(191, 209, 235, 0.7);
-  }
-  100% {
-    color: rgba(148, 163, 184, 0.16);
-    text-shadow: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hexdump .cell {
-    transition: none;
-  }
+/* anchor targets clear the sticky header (pairs with html scroll-behavior) */
+section[data-month] {
+  scroll-margin-top: 8rem;
 }
 
 /* noise grain */

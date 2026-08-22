@@ -19,7 +19,7 @@ don't always need server side rendering), and going from there. My goal again ta
 
 If the traffic to the blog scales then I can scale with it but the next step is not necessarily going to one of the major cloud providers like [AWS](https://aws.amazon.com). There are plenty of host providers out there and even when it comes to containerized workloads [Railway](https://railway.com/pricing), or [Vultr](https://www.vultr.com/pricing/#cloud-compute) make more sense. The same applies to databases but there are other requirements like availability, redundancy etc. I do miss [Linode](https://www.akamai.com/newsroom/press-release/akamai-completes-acquisition-of-linode)
 
-![Pouring out one for Linode](../../assets/pour-one-out.gif)
+![Pouring out one for Linode](../../assets/pour-one-out.webp)
 
 So with whatever project you are working on especially the first time take things small.
 Work your way up as only consistency and repetition makes you better and always be curious to try

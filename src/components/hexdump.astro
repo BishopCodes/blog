@@ -1,89 +1,48 @@
 ---
-// Easter egg fully static — rendered at build time, zero client JS. Rows repeat
-// enough times to cover any realistic viewport height since the
-// container is position:fixed (viewport-sized, never taller than that).
-
-const HEX_ROWS: [string, string[]][] = [
-  ["0002AA30", ["20 1A A1 D8", "CB 51 07 24", "3B A0 5E 60", "4A DE A0 1F"]],
-  ["0002AA40", ["35 CA 68 1D", "02 A1 2B C3", "CB 8A 09 DE", "28 AD 52 CC"]],
-  ["0002AA50", ["7C 7C 30 9D", "9B 6F 59 25", "13 36 87 F0", "AA 98 EF E4"]],
-  ["0002AA60", ["DF 97 9C 9F", "6D 7B F0 73", "0B 84 D4 7B", "D3 9A 5F 09"]],
-  ["0002AA70", ["36 F0 42 60", "C1 85 17 0D", "33 15 C7 35", "49 94 9E AD"]],
-  ["0002AA80", ["BC AC 64 94", "B9 B5 F1 8B", "3D 07 BC 40", "E8 C3 4E A0"]],
-  ["0002AA90", ["8D EB F6 F9", "9C 15 44 88", "6D A1 2E 61", "48 6C 00 A0"]],
-  ["0002AAA0", ["27 FE DD 65", "68 DB 13 3B", "D9 17 A9 AB", "9C 22 63 0B"]],
-  ["0002AAB0", ["44 B8 65 B9", "60 D0 3F D6", "37 35 CC 72", "80 04 62 6A"]],
-  ["0002AAC0", ["15 31 B6 E3", "FC ED 85 A3", "75 B4 41 56", "61 8A 2C C4"]],
-  ["0002AAD0", ["81 90 E2 77", "31 A0 1C A3", "D6 83 2F C3", "50 ED 9F 11"]],
-  ["0002AAE0", ["5C 5D 05 B3", "E7 BC C8 82", "1B F5 AE 58", "FB 47 8E 16"]],
-  ["0002AAF0", ["2D 86 5A D4", "EC 78 C4 92", "13 96 05 4D", "AF 12 01 5F"]],
-  ["0002AB00", ["82 07 AF E8", "51 07 AA 80", "2D 96 14 00", "79 96 BD 09"]],
-  ["0002AB10", ["C5 C3 C0 02", "9A 9B 7A 48", "53 09 2D C0", "85 DB 7A D4"]],
-  ["0002AB20", ["4C 20 B0 34", "7C 63 FF A6", "BC 05 09 36", "62 2C 54 E5"]],
-  ["0002AB30", ["A7 56 0F 79", "C8 38 14 30", "AF E6 28 9D", "A1 C7 84 7B"]],
-  ["0002AB40", ["86 37 20 6D", "D6 AD 4A 92", "A8 38 A6 A9", "72 0A 09 DC"]],
-  ["0002AB50", ["9E 10 04 80", "9B E4 E3 58", "4B E7 8C FE", "12 61 FF E8"]],
-  ["0002AB60", ["BE 5A A6 9F", "85 9F C8 4B", "99 7D 07 C4", "4C F7 7C 2D"]],
-  ["0002AB70", ["0A D8"]],
-];
-
-interface Props {
-  repeats?: number;
-}
-const { repeats = 6 } = Astro.props;
-
-const DURATIONS = [4.1, 4.7, 5.3, 5.8, 6.3];
-
-let i = 0;
-const hexRows: {
-  addr: string;
-  groups: string[];
-  litIndex: number;
-  delay: string;
-  dur: number;
-}[] = [];
-
-for (let rep = 0; rep < repeats; rep++) {
-  for (const [addr, groups] of HEX_ROWS) {
-    const cellCount = groups.reduce((n, g) => n + g.split(" ").length, 0);
-    const litIndex = i % 2 === 0 ? (i * 7) % cellCount : -1;
-    hexRows.push({
-      addr,
-      groups,
-      litIndex,
-      delay: ((i * 0.6) % 4.2).toFixed(1),
-      dur: DURATIONS[i % DURATIONS.length],
-    });
-    i++;
-  }
-}
+// Easter egg: hex-dump backdrop, fully static, zero client JS.
+//
+// The texture is pre-generated as small SVG tiles (pnpm generate:hex,
+// scripts/generate-hex-tile.mjs) instead of inlined data URIs, so each page
+// ships only this CSS. The browser fetches exactly one tile per session —
+// picked by viewport width and reduced-motion — and caches it; the SMIL
+// "lit byte" animation runs inside the background image. If a browser doesn't
+// run SMIL in background images it degrades to the static texture.
+//
+// Desktop tile: 14 px type, 924 px wide (old `.hexrow` cap: min(100%, 110ch)).
+// Compact tile: 11 px type (the clamp() minimum) for viewports under 924 px.
 ---
 
-<div id="hexdump" aria-hidden="true" class="hexdump">
-  {
-    hexRows.map((row) => {
-      let idx = 0;
-      return (
-        <div class="hexrow">
-          <span class="addr">/.. {row.addr}</span>
-          {row.groups.map((g) => (
-            <span class="hgroup">
-              {g.split(" ").map((b) => {
-                const isLit = idx === row.litIndex;
-                const style = isLit
-                  ? `animation-delay:${row.delay}s;animation-duration:${row.dur}s`
-                  : undefined;
-                idx++;
-                return (
-                  <span class={isLit ? "cell lit" : "cell"} style={style}>
-                    {b}
-                  </span>
-                );
-              })}
-            </span>
-          ))}
-        </div>
-      );
-    })
+<style>
+  .hexdump {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    background-image: url("/hex-tile.svg");
+    background-repeat: repeat-y;
+    background-position: 50% 0.75rem;
+    -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 97%);
+    mask-image: linear-gradient(to bottom, black 55%, transparent 97%);
   }
-</div>
+
+  @media (max-width: 923px) {
+    .hexdump {
+      background-image: url("/hex-tile-mobile.svg");
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hexdump {
+      background-image: url("/hex-tile-still.svg");
+    }
+  }
+
+  @media (max-width: 923px) and (prefers-reduced-motion: reduce) {
+    .hexdump {
+      background-image: url("/hex-tile-mobile-still.svg");
+    }
+  }
+</style>
+
+<div class="hexdump" aria-hidden="true"></div>

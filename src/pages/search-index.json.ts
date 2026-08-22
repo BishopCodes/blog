@@ -23,7 +23,9 @@ export async function GET() {
     description: post.data.description,
     content: post.body,
     tag: post.data.tag,
-    path: `/posts/${post.id}`,
+    // Trailing slash matches the built routes and the rest of the site's links,
+    // so search clicks navigate directly instead of via a 301.
+    path: `/posts/${post.id}/`,
   }));
 
   insertMultiple(db, documents);
@@ -33,6 +35,8 @@ export async function GET() {
   return new Response(JSON.stringify(index), {
     headers: {
       "Content-Type": "application/json",
+      // Rebuilt on every deploy; safe to cache per session.
+      "Cache-Control": "public, max-age=3600",
     },
   });
 }
